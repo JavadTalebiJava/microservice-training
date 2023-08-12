@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orderdb
+    username: postgres
+    password: postgres
+    type: org.postgresql.ds.PGPoolingDataSource
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+server:
+  port: 4001
