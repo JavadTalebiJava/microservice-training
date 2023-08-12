@@ -43,6 +43,26 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     /**
+     * checks the inventory for the stock availability of a stock by barcode
+     *
+     * @param skuCodes
+     * @return A list of InventoryResponse objects representing the availability of the product.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<InventoryResponse> isAvailable(List<String> skuCodes) {
+        return inventoryRepository.findAllBySku(skuCodes)
+                .stream()
+                .map(inventory -> InventoryResponse.builder()
+                                    .id(inventory.getId())
+                                    .createdDate(inventory.getCreatedDate())
+                                    .sku(inventory.getSku())
+                                    .barcode(inventory.getBarcode())
+                                    .qty(inventory.getQty()).build())
+                .toList();
+    }
+
+    /**
      * Maps a {@link Inventory} object to a {@link InventoryResponse} object.
      *
      * @param inventory The {@link Inventory} object to be converted into the response format.
@@ -58,15 +78,5 @@ public class InventoryServiceImpl implements InventoryService {
                 .build();
     }
 
-    /**
-     * checks the inventory for the stock availability of a stock by barcode
-     *
-     * @param barcode
-     * @return boolean
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public boolean isAvailable(String barcode) {
-        return inventoryRepository.findByBarcode(barcode).isPresent();
-    }
+
 }

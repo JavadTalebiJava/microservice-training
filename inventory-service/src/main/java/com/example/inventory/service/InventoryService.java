@@ -25,8 +25,8 @@ public interface InventoryService {
     /**
      * checks the inventory for the stock availability of a stock by barcode
      *
-     * @param barcode
-     * @return boolean
+     * @param skuCodes
+     * @return A list of InventoryResponse objects representing the availability of the product.
      */
-    boolean isAvailable(String barcode);
+    List<InventoryResponse> isAvailable(List<String> skuCodes);
 }

@@ -10,17 +10,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/inventories")
+@RequestMapping("/v1/inventory")
 @RequiredArgsConstructor
 @Slf4j
 public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    //http://localhost:4002/v1/inventory/11111,22222
+    //http://localhost:4002/v1/inventory/sku=11111,sku=22222
     @GetMapping("/{barcode}")
     @ResponseStatus(HttpStatus.OK)
-    public boolean isInStock(@PathVariable String barcode) {
-        return inventoryService.isAvailable(barcode);
+    public List<InventoryResponse> isInStock(@RequestParam("sku") List<String> skuCodes) {
+        return inventoryService.isAvailable(skuCodes);
     }
 
     @GetMapping

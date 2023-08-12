@@ -5,6 +5,8 @@ import com.example.product.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +49,14 @@ class ProductServiceApplicationTests {
     }
 
     @Before
-    void setup() {
+     void setup() {
         log.info(mongoDBContainer.getContainerName());
+
     }
 
     @Test
     void shouldCreateProduct() throws Exception {
+        productRepository.deleteAll();
         ProductRequest productRequest = ProductRequest.builder()
                 .name("test Macbook")
                 .description("test Macbook")
@@ -65,6 +69,5 @@ class ProductServiceApplicationTests {
                 .andExpect(status().isCreated());
         Assertions.assertEquals(1, productRepository.findAll().size());
     }
-
 
 }
