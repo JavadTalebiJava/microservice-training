@@ -28,8 +28,8 @@ public class OrderItem {
 
     private BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "order_Id")
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "order_id")
     private Order order;
 
 }

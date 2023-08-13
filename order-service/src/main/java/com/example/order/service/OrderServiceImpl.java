@@ -3,24 +3,37 @@ package com.example.order.service;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
 import com.example.order.model.dto.OrderItemDto;
+import com.example.order.model.dto.request.InventoryRequest;
 import com.example.order.model.dto.request.OrderRequest;
+import com.example.order.model.dto.response.InventoryResponse;
 import com.example.order.model.dto.response.OrderResponse;
 import com.example.order.repository.OrderRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @Transactional //spring will automatically commit the transactions
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private WebClient webClient;
+
+    private final String invetoryServceUrl = "http://localhost:4002/v1/inventory/check";
+    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClient) {
+        this.orderRepository = orderRepository;
+        this.webClient = webClient.build();
+    }
 
     /**
      * place order
@@ -29,9 +42,33 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public void placeOrder(OrderRequest orderRequest) {
-        orderRepository.save(orderRequest.convert());
+         List<String> skuCodes = orderRequest.getOrderItems().stream().map(OrderItemDto::getSku).toList();
+
+        //call Inventory Service and Place Order if all Products are in stock
+        boolean allProductsInStock = fetchStockInventoryAvialability(InventoryRequest.builder().skuCodes(skuCodes).build());
+
+        if (allProductsInStock){
+            Order order = orderRequest.convert();
+            orderRepository.save(order);
+        } else {
+            throw new IllegalArgumentException("Product is not in stock!");
+        }
+
     }
 
+    public boolean fetchStockInventoryAvialability(InventoryRequest inventoryRequest) {
+        Flux<List<InventoryResponse>> data = webClient.post()
+                .uri(invetoryServceUrl)
+                .body(BodyInserters.fromValue(inventoryRequest))
+                .retrieve()
+                .bodyToFlux(InventoryResponse.class)
+                .collectList()
+                .flux();
+        List<InventoryResponse> responseArray = data.blockLast();
+        log.info(responseArray.toString());
+        return responseArray.stream()
+                .allMatch(InventoryResponse::isInStock);
+    }
     /**
      * Fetches all orders from the database.
      *

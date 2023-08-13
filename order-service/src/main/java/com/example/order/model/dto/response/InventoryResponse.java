@@ -1,4 +1,4 @@
-package com.example.inventory.model.dto.response;
+package com.example.order.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

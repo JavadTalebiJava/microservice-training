@@ -1,5 +1,6 @@
 package com.example.inventory.controller;
 
+import com.example.inventory.model.dto.request.InventoryRequest;
 import com.example.inventory.model.dto.response.InventoryResponse;
 import com.example.inventory.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,12 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    //http://localhost:4002/v1/inventory/11111,22222
-    //http://localhost:4002/v1/inventory/sku=11111,sku=22222
-    @GetMapping("/{barcode}")
+    //http://localhost:4002/v1/inventory/check/11111,22222
+    //http://localhost:4002/v1/inventory/check/skuCode=11111,skuCode=22222
+    @PostMapping("/check")
     @ResponseStatus(HttpStatus.OK)
-    public List<InventoryResponse> isInStock(@RequestParam("sku") List<String> skuCodes) {
-        return inventoryService.isAvailable(skuCodes);
+    public List<InventoryResponse> isInStock(@RequestBody InventoryRequest inventoryRequest) {
+        return inventoryService.isAvailable(inventoryRequest.getSkuCodes());
     }
 
     @GetMapping

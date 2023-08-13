@@ -1,4 +1,4 @@
-package com.example.inventory.model.dto.request;
+package com.example.order.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

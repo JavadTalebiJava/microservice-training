@@ -1,5 +1,6 @@
 package com.example.order.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,9 @@ public class Order {
     private BigDecimal total;
     private BigDecimal tax;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "order",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 }
