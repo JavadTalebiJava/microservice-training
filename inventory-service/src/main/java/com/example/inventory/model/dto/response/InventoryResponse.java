@@ -16,7 +16,7 @@ public class InventoryResponse {
     private Long id;
 
     private String sku;
-    private String barcode;
+    private String name;
     private float qty;
 
     private boolean inStock;

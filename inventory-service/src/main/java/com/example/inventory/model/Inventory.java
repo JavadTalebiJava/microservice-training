@@ -22,7 +22,7 @@ public class Inventory {
     private LocalDateTime createdDate;
 
     private String sku;
-    private String barcode;
+    private String name;
     private float qty;
 }
 

@@ -23,8 +23,8 @@ public class InventoryServiceApplication {
 	public CommandLineRunner commandLineRunner(InventoryRepository inventoryRepository) {
 		return args -> {
 			inventoryRepository.saveAll(
-					Set.of(Inventory.builder().sku("iphone13").barcode("1111").qty(100).createdDate(LocalDateTime.now()).build(),
-							Inventory.builder().sku("iphone14").barcode("2222").qty(0).createdDate(LocalDateTime.now()).build()));
+					Set.of(Inventory.builder().sku("1111").name("iphone13").qty(100).createdDate(LocalDateTime.now()).build(),
+							Inventory.builder().sku("2222").name("iphone14").qty(1).createdDate(LocalDateTime.now()).build()));
 		};
 	}
 }

@@ -51,13 +51,13 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(readOnly = true)
     public List<InventoryResponse> isAvailable(List<String> skuCodes) {
-        List<Inventory> lst = inventoryRepository.findAllBySkuIn(skuCodes);
+        List<Inventory> lst = inventoryRepository.findInventoriesBySkuIn(skuCodes);
 
         List<InventoryResponse> lst2 = lst.stream()
                 .map(inventory -> InventoryResponse.builder()
                         .id(inventory.getId())
                         .sku(inventory.getSku())
-                        .barcode(inventory.getBarcode())
+                        .name(inventory.getName())
                         .qty(inventory.getQty())
                         .inStock(inventory.getQty() > 0)
                         .build())
@@ -76,7 +76,7 @@ public class InventoryServiceImpl implements InventoryService {
         return InventoryResponse.builder()
                 .id(inventory.getId())
                 .sku(inventory.getSku())
-                .barcode(inventory.getBarcode())
+                .name(inventory.getName())
                 .qty(inventory.getQty())
                 .build();
     }
