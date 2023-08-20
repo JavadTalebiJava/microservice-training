@@ -8,32 +8,35 @@ import com.example.order.model.dto.request.OrderRequest;
 import com.example.order.model.dto.response.InventoryResponse;
 import com.example.order.model.dto.response.OrderResponse;
 import com.example.order.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.client.RestTemplate;
+/*import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;*/
 
-import java.util.Arrays;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @Transactional //spring will automatically commit the transactions
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private WebClient webClient;
+    //private final WebClient.Builder webClientBuilder;
+    private final RestTemplate restTemplate;
+    //private final String inventoryServiceUrl = "http://vitelco_user6.local:inventory-service/v1/inventory/check"; //"http://localhost:4002/v1/inventory/check";
 
-    private final String invetoryServceUrl = "http://localhost:4002/v1/inventory/check";
-    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClient) {
-        this.orderRepository = orderRepository;
-        this.webClient = webClient.build();
-    }
 
     /**
      * place order
@@ -41,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderRequest
      */
     @Override
-    public void placeOrder(OrderRequest orderRequest) {
+    public void placeOrder(OrderRequest orderRequest) throws URISyntaxException {
          List<String> skuCodes = orderRequest.getOrderItems().stream().map(OrderItemDto::getSku).toList();
 
         //call Inventory Service and Place Order if all Products are in stock
@@ -56,9 +59,25 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    private boolean fetchStockInventoryAvialability(InventoryRequest inventoryRequest) throws URISyntaxException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        URI uri = new URI("http://localhost:4002/v1/inventory/check");
+
+
+        HttpEntity<InventoryRequest> httpEntity = new HttpEntity<>(inventoryRequest, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.postForObject(uri, httpEntity, String.class);
+        log.info(result);
+        return true;
+    }
+
+   /* @LoadBalanced
     public boolean fetchStockInventoryAvialability(InventoryRequest inventoryRequest) {
-        Flux<List<InventoryResponse>> data = webClient.post()
-                .uri(invetoryServceUrl)
+        Flux<List<InventoryResponse>> data = webClientBuilder.build().post()
+                .uri(inventoryServiceUrl)
                 .body(BodyInserters.fromValue(inventoryRequest))
                 .retrieve()
                 .bodyToFlux(InventoryResponse.class)
@@ -68,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         log.info(responseArray.toString());
         return responseArray.stream()
                 .allMatch(InventoryResponse::isInStock);
-    }
+    }*/
     /**
      * Fetches all orders from the database.
      *

@@ -3,11 +3,13 @@ package com.example.order.controller;
 import com.example.order.model.dto.request.OrderRequest;
 import com.example.order.model.dto.response.OrderResponse;
 import com.example.order.service.OrderService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -20,7 +22,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody OrderRequest orderRequest) {
+    public void create(@RequestBody OrderRequest orderRequest) throws URISyntaxException {
         orderService.placeOrder(orderRequest);
     }
 
@@ -29,4 +31,6 @@ public class OrderController {
     public List<OrderResponse> fetchAll() {
         return orderService.findAll();
     }
+
+
 }
